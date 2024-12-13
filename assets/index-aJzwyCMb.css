@@ -1,0 +1,1 @@
+.cube-grid{display:grid;grid-template-columns:repeat(4,75px);grid-template-rows:repeat(3,75px);gap:10px}.face-container{display:flex;justify-content:center;align-items:center}.face{display:grid;gap:2px}.sticker{width:25px;height:25px;border:1px solid #000}
