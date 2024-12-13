@@ -1,10 +1,12 @@
 import "./App.css";
-import Message from "./Message";
+import Message from "./components/Message";
+import RCube from "./components/RCube";
 
 function App() {
   return (
     <div>
-      <Message children="Hello World" />
+      <Message children="Features are still under development ~" />
+      <RCube />
     </div>
   );
 }
