@@ -4,7 +4,7 @@ import RCube from "./components/RCube";
 
 function App() {
   return (
-    <div>
+    <div className="app">
       <Message children="Features are still under development ~" />
       <RCube />
     </div>

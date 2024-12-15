@@ -1,24 +1,16 @@
-.cube-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 75px);
-    grid-template-rows: repeat(3, 75px);
-    gap: 10px;
+.displayer {
+    position: relative;
+    height: 60vh;
+    width: 100vw;
+    background-color:rgba(44, 0, 146, 0.13);
+    overflow: hidden;
   }
   
-  .face-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  /* Styling for the Canvas */
+  .rubik-canvas {
+    position: absolute;
+    top: 0%; /* Start 20% down the viewport */
+    height: 20%; /* Cover 40% of the viewport height */
+    width: 100%; /* Full width */
+    overflow: hidden; /* Ensure no overflow in the canvas itself */
   }
-  
-  .face {
-    display: grid;
-    gap: 2px;
-  }
-  
-  .sticker {
-    width: 25px;
-    height: 25px;
-    border: 1px solid #000;
-  }
-  
