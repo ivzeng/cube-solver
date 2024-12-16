@@ -6,10 +6,17 @@ import {
   OrthographicCamera,
 } from "@react-three/drei";
 
-const colors = ["white", "red", "green", "yellow", "orange", "blue"];
-const blockSize = 20;
-const cBlockSize = 17;
-const blockheight = 3;
+const colors = [
+  "white", // top
+  "red", // front
+  "blue", // right
+  "orange", // back
+  "green", //left
+  "yellow", // down
+];
+const blockSize = 10;
+const cBlockSize = 8;
+const blockheight = 1;
 
 interface RCubeBlockProps {
   colorIndex: number;
@@ -53,17 +60,17 @@ const RCubeDisplay: React.FC<RCubeDisplayProps> = ({
     const faceOffset = ((blockSize * Math.SQRT2) / 2) * shape; // Spacing to center the cube faces
     const facePositions: [number, number, number][] = is3d
       ? [
+          [0, faceOffset, 0], // Top
           [0, 0, faceOffset], // Front
           [faceOffset, 0, 0], // Right
-          [0, faceOffset, 0], // Top
           [0, 0, -faceOffset], // Back
           [-faceOffset, 0, 0], // Left
           [0, -faceOffset, 0], // Bottom
         ]
       : [
+          [0, faceOffset * 2 + 2, 0], // Top
           [0, 0, 0], // Front
           [faceOffset * 2 + 2, 0, 0], // Right
-          [0, faceOffset * 2 + 2, 0], // Top
           [faceOffset * 4 + 4, 0, 0], // Back
           [-faceOffset * 2 - 2, 0, 0], // Left
           [0, -faceOffset * 2 - 2, 0], // Bottom
@@ -71,9 +78,9 @@ const RCubeDisplay: React.FC<RCubeDisplayProps> = ({
 
     const rotationAxes: [number, number, number][] = is3d
       ? [
+          [-Math.PI / 2, 0, 0], // Top
           [0, 0, 0], // Front
           [0, Math.PI / 2, 0], // Right
-          [-Math.PI / 2, 0, 0], // Top
           [0, Math.PI, 0], // Back
           [0, -Math.PI / 2, 0], // Left
           [Math.PI / 2, 0, 0], // Bottom
@@ -85,7 +92,7 @@ const RCubeDisplay: React.FC<RCubeDisplayProps> = ({
     const blocks = [];
     const blockOffset = (shape - 1) / 2;
     for (let row = 0; row < shape; row++) {
-      const y = -(row - blockOffset) * blockSize * Math.SQRT2;
+      const y = (row - blockOffset) * blockSize * Math.SQRT2;
       const z = 0;
       for (let col = 0; col < shape; col++) {
         const x = (col - blockOffset) * blockSize * Math.SQRT2;
