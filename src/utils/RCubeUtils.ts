@@ -65,10 +65,6 @@ function rotatedFace(face: number[][], rotationAngle: number, shape: number) {
   console.log(rotationAngle);
   return face.map((row, y) =>
     row.map((_, x) => {
-      // 1: x y = 3 0  1 0 => 3-1-0 1
-      // 2: x y = 2 3  1 0 => 3-1-1 3-1-0
-      // 3: x y = 1 2  1 0 => 3-1-0 1
-
       let pos = [x, y, shape - x - 1, shape - y - 1];
       return face[pos[(4 - rotationAngle + 1) % 4]][pos[4 - rotationAngle]];
     })
@@ -86,7 +82,7 @@ function rotateSide(
   switch (axis) {
     case "x":
       ringPos = ringPos.map((_, index) => [
-        shape - ((index / shape) >> 0) + 1,
+        4 - ((index / shape) >> 0),
         layer,
         shape - 1 - (index % shape),
       ]);
