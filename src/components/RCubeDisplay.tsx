@@ -4,6 +4,7 @@ import {
   Cylinder,
   PerspectiveCamera,
   OrthographicCamera,
+  OrbitControls,
 } from "@react-three/drei";
 
 const colors = [
@@ -122,14 +123,17 @@ const RCubeDisplay: React.FC<RCubeDisplayProps> = ({
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       {is3d ? (
-        <PerspectiveCamera
-          makeDefault
-          position={[
-            blockSize * shape * 1.5,
-            blockSize * shape * 1.5,
-            blockSize * shape * 3,
-          ]}
-        />
+        <>
+          <PerspectiveCamera
+            makeDefault
+            position={[
+              blockSize * shape * 1.5,
+              blockSize * shape * 1.5,
+              blockSize * shape * 3,
+            ]}
+          />
+          <OrbitControls />
+        </>
       ) : (
         <OrthographicCamera makeDefault position={[0, 0, 5]} />
       )}

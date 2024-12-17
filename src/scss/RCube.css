@@ -1,0 +1,23 @@
+.displayer {
+  position: relative;
+  height: 40vh;
+  width: 100vw;
+  background-color: rgb(52, 44, 58);
+  overflow: hidden;
+}
+
+.rubik-canvas {
+  position: absolute;
+  top: 0%;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.user-control {
+  padding-top: 10px;
+  height: 45vh;
+  width: 100vw;
+  background-color: rgb(199, 193, 252);
+  overflow: hidden;
+}

@@ -1,4 +1,4 @@
-import "./App.css";
+import "./scss/App.css";
 import Message from "./components/Message";
 import RCube from "./components/RCube";
 
