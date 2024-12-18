@@ -11,5 +11,5 @@
   height: 65vh;
   width: 100vw;
   background-color: rgb(252, 246, 255);
-  overflow: hidden;
+  overflow-y: scroll;
 }
