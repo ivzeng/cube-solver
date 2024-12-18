@@ -1,30 +1,29 @@
 export function appliedMoves(cubeInfo: number[][][], moves: string) {
   let i = 0;
   let res = deepCopy(cubeInfo);
+  let shape = cubeInfo[0].length;
   while (i < moves.length) {
-    applyMove(res, moves.substring(i, i + 3));
+    const curMove = moves.substring(i, i + 3);
+    if (curMove[0] == "r") {
+      for (let i = 0; i < shape; i++) {
+        applyMove(res, curMove[1] + i + curMove[2], shape);
+      }
+    } else {
+      applyMove(res, curMove, shape);
+    }
     i += 3;
   }
   return res;
-}
-
-export function getViewRotation(rotation: string, shape: number) {
-  let moves = "";
-  for (let i = 0; i < shape; i++) {
-    moves += rotation[0] + i + rotation[1];
-  }
-  return moves;
 }
 
 const deepCopy = (arr: any[]): any[] => {
   return arr.map((item) => (Array.isArray(item) ? deepCopy(item) : item));
 };
 
-function applyMove(cubeInfo: number[][][], moves: string) {
+function applyMove(cubeInfo: number[][][], moves: string, shape: number) {
   let axis = moves.charAt(0);
   let layer = +moves.charAt(1);
   let angle = +moves.charAt(2);
-  let shape = cubeInfo[0].length;
   rotateFace(cubeInfo, axis, layer, angle, shape);
   rotateSide(cubeInfo, axis, layer, angle, shape);
 }
@@ -130,19 +129,22 @@ function ringShift(
   }
 }
 
-export function reversedMoves(moves: string) {
-  let rMoves = "";
-  let prevReversed = "";
-  for (let i = moves.length - 3; i >= 0; i -= 3) {
-    let curMove = moves.substring(i, i + 3);
-    if (curMove == prevReversed) {
-      prevReversed = "";
+export function reverseSolve(moves: string) {
+  let rMoveStack: string[] = [];
+  for (let i = 0; i < moves.length; i += 3) {
+    const curMove = moves.substring(i, i + 3);
+    let rl = rMoveStack.length;
+    if (rl > 0 && rMoveStack[rl - 1] == curMove) {
+      rMoveStack.pop();
     } else {
-      rMoves += prevReversed;
-      prevReversed = reversedMove(curMove);
+      rMoveStack.push(reversedMove(curMove));
     }
   }
-  return rMoves + prevReversed;
+  let res = "";
+  for (let i = rMoveStack.length - 1; i >= 0; i--) {
+    res += rMoveStack[i];
+  }
+  return res;
 }
 
 export function reversedMove(move: string) {

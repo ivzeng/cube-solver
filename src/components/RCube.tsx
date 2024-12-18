@@ -2,12 +2,7 @@ import React, { useRef, useState } from "react";
 import "../scss/RCube.css";
 import RCubeDisplay from "./RCubeDisplay";
 import { Canvas } from "@react-three/fiber";
-import {
-  appliedMoves,
-  getViewRotation,
-  reversedMove,
-  reversedMoves,
-} from "../utils/RCubeUtils";
+import { appliedMoves, reversedMove, reverseSolve } from "../utils/RCubeUtils";
 import BtnDropdown from "./BtnDropdown";
 import Collapse from "./Collapse";
 
@@ -34,7 +29,7 @@ const RCube: React.FC = () => {
         setRCubeInfo(appliedMoves(rCubeInfo, move));
       }}
     >
-      {`${text} (${move})`}
+      {`${text}| ${move}`}
     </button>
   );
 
@@ -92,22 +87,22 @@ const RCube: React.FC = () => {
         <div className=" user-menu container text-center">
           <div className="row justify-content-start">
             <BtnDropdown
-              text={`Current View: ${is3d ? "3d" : "2d"}`}
+              text={is3d ? "3D" : "2D"}
               dropdown={[
                 ["2d", () => setIs3d(false)],
                 ["3d", () => setIs3d(true)],
               ]}
-              btnGroupClassName="col-4"
+              btnGroupClassName="col"
               btnClassName="btn btn-primary"
               id="viewDropdown"
             />
             <BtnDropdown
-              text={`Current Cube Shape: ${shape.current}x${shape.current}`}
+              text={`${shape.current}x${shape.current}`}
               dropdown={[
                 ["2x2", () => handleShapeChange(2)],
                 ["3x3", () => handleShapeChange(3)],
               ]}
-              btnGroupClassName="col-5"
+              btnGroupClassName="col"
               btnClassName="btn btn-danger"
               id="shapeDropdown"
             />
@@ -125,59 +120,41 @@ const RCube: React.FC = () => {
           </div>
           <Collapse
             textMain="Solution:"
-            textContent={reversedMoves(hist.current)}
+            textContent={reverseSolve(hist.current)}
             btnClassName="btn-info"
             collapseClassName=""
             id="solution"
           />
         </div>
 
-        <div className="user-moves container text-center mt-3">
-          <div className="row align-items-center mx-2">
+        <div className="user-moves container text-center mt-2">
+          <div className="row align-items-center">
             <ControlButton text="L'" move={"y01"} />
             <ControlButton text="U " move={`x${shape.current - 1}1`} />
             <ControlButton text="U'" move={`x${shape.current - 1}3`} />
-            <ControlButton text="R" move={`y${shape.current - 1}1`} />
+            <ControlButton text="R " move={`y${shape.current - 1}1`} />
           </div>
-          <div className="row align-items-center mx-2">
+          <div className="row align-items-center">
             <ControlButton text="B " move={`z${shape.current - 1}3`} />
             <ControlButton text="F'" move={"z03"} />
             <ControlButton text="F " move={"z01"} />
             <ControlButton text="B'" move={`z${shape.current - 1}1`} />
           </div>
-          <div className="row align-items-center mx-2">
+          <div className="row align-items-center">
             <ControlButton text="L " move={"y03"} />
             <ControlButton text="D'" move={"x01"} />
             <ControlButton text="D " move={"x03"} />
             <ControlButton text="R'" move={`y${shape.current - 1}3`} />
           </div>
-          <div className="row align-items-center mx-2">
-            <ControlButton
-              text="X "
-              move={getViewRotation("x1", shape.current)}
-            />
-            <ControlButton
-              text="Y "
-              move={getViewRotation("y1", shape.current)}
-            />
-            <ControlButton
-              text="X'"
-              move={getViewRotation("x3", shape.current)}
-            />
+          <div className="row align-items-center">
+            <ControlButton text="X " move="rx1" />
+            <ControlButton text="Y " move="ry1" />
+            <ControlButton text="X'" move="rx3" />
           </div>
-          <div className="row align-items-center mx-2">
-            <ControlButton
-              text="Z'"
-              move={getViewRotation("z3", shape.current)}
-            />
-            <ControlButton
-              text="Y'"
-              move={getViewRotation("y3", shape.current)}
-            />
-            <ControlButton
-              text="Z "
-              move={getViewRotation("z1", shape.current)}
-            />
+          <div className="row align-items-center">
+            <ControlButton text="Z'" move="rz3" />
+            <ControlButton text="Y'" move="ry3" />
+            <ControlButton text="Z " move="rz1" />
           </div>
         </div>
       </div>

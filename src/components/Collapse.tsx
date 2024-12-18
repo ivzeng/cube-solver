@@ -15,10 +15,10 @@ function Collapse({
 }: Props) {
   return (
     <div
-      className="collapse-container"
-      style={{ display: "flex", alignItems: "center", width: "100%" }}
+      className="collapse-container align-items-center mt-2"
+      style={{ display: "flex", width: "100%" }}
     >
-      <p>
+      <p style={{ width: "30%" }}>
         <button
           className={`btn ${btnClassName} btn-block`}
           type="button"
@@ -26,6 +26,7 @@ function Collapse({
           data-bs-target={`#${id}`}
           aria-expanded="false"
           aria-controls={id}
+          style={{ width: "80%" }}
         >
           {textMain}
         </button>
