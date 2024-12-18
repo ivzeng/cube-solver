@@ -1,8 +1,15 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "../scss/RCube.css";
 import RCubeDisplay from "./RCubeDisplay";
 import { Canvas } from "@react-three/fiber";
-import { appliedMoves } from "../utils/RCubeUtils";
+import {
+  appliedMoves,
+  getViewRotation,
+  reversedMove,
+  reversedMoves,
+} from "../utils/RCubeUtils";
+import BtnDropdown from "./BtnDropdown";
+import Collapse from "./Collapse";
 
 const RCube: React.FC = () => {
   const initRCubeInfo = (shape: number): number[][][] => {
@@ -22,86 +29,155 @@ const RCube: React.FC = () => {
     <button
       type="button"
       className="btn btn-outline-primary col m-1"
-      onClick={() => setRCubeInfo(appliedMoves(rCubeInfo, move))}
+      onClick={() => {
+        updateHist(move);
+        setRCubeInfo(appliedMoves(rCubeInfo, move));
+      }}
     >
-      {text}
+      {`${text} (${move})`}
     </button>
   );
 
-  const getViewRotation = (rotation: string, shape: number) => {
-    let moves = "";
-    for (let i = 0; i < shape; i++) {
-      moves += rotation[0] + i + rotation[1];
-    }
-    return moves;
+  const handleShapeChange = (newShape: number) => {
+    clearHist();
+    setShape(newShape);
+    setRCubeInfo(initRCubeInfo(newShape));
   };
 
-  const [shape, setShape] = useState<number>(3);
+  const setShape = (newShape: number) => {
+    shape.current = newShape;
+  };
+
+  const clearHist = () => {
+    hist.current = "";
+  };
+
+  const updateHist = (move: string) => {
+    hist.current += move;
+  };
+
+  const peekHist = () => {
+    let hl = hist.current.length;
+    return hl == 0 ? "" : hist.current.substring(hl - 3, hl);
+  };
+
+  const popHist = () => {
+    let histTop = peekHist();
+    if (histTop.length > 0) {
+      hist.current = hist.current.substring(0, hist.current.length - 3);
+    }
+    return histTop;
+  };
+
+  let shape = useRef(3);
+  let hist = useRef("");
   const [rCubeInfo, setRCubeInfo] = useState<number[][][]>(
-    initRCubeInfo(shape)
+    initRCubeInfo(shape.current)
   );
   const [is3d, setIs3d] = useState<boolean>(false);
+
   return (
     <>
       <div className="displayer">
         <Canvas className="rubik-canvas">
-          <RCubeDisplay rCubeInfo={rCubeInfo} is3d={is3d} shape={shape} />
+          <RCubeDisplay
+            rCubeInfo={rCubeInfo}
+            is3d={is3d}
+            shape={shape.current}
+          />
         </Canvas>
       </div>
+
       <div className="user-control">
-        <div className=" menu container text-center">
-          <div className="row align-items-center">
+        <div className=" user-menu container text-center">
+          <div className="row justify-content-start">
+            <BtnDropdown
+              text={`Current View: ${is3d ? "3d" : "2d"}`}
+              dropdown={[
+                ["2d", () => setIs3d(false)],
+                ["3d", () => setIs3d(true)],
+              ]}
+              btnGroupClassName="col-4"
+              btnClassName="btn btn-primary"
+              id="viewDropdown"
+            />
+            <BtnDropdown
+              text={`Current Cube Shape: ${shape.current}x${shape.current}`}
+              dropdown={[
+                ["2x2", () => handleShapeChange(2)],
+                ["3x3", () => handleShapeChange(3)],
+              ]}
+              btnGroupClassName="col-5"
+              btnClassName="btn btn-danger"
+              id="shapeDropdown"
+            />
             <button
-              className="btn btn-primary col"
-              onClick={() => setIs3d(!is3d)}
+              type="button"
+              className="btn btn-success col"
+              onClick={() => {
+                const prevMove = popHist();
+                setRCubeInfo(appliedMoves(rCubeInfo, reversedMove(prevMove)));
+              }}
+              disabled={peekHist().length == 0}
             >
-              {is3d ? "Switch to 2D" : "Switch to 3D"}
+              {`Undo ${peekHist()}`}
             </button>
-            <span className="col">
-              <label htmlFor="shape-select">Select Shape: </label>
-              <select
-                id="shape-select"
-                value={shape}
-                onChange={(e) => {
-                  const newShape = Number(e.target.value);
-                  setShape(newShape);
-                  setRCubeInfo(initRCubeInfo(newShape));
-                }}
-              >
-                <option value={2}>2</option> <option value={3}>3</option>
-                {/*<option value={4}>4</option>*/}
-              </select>
-            </span>
           </div>
+          <Collapse
+            textMain="Solution:"
+            textContent={reversedMoves(hist.current)}
+            btnClassName="btn-info"
+            collapseClassName=""
+            id="solution"
+          />
         </div>
-        <div className="user-move container text-center ">
-          <div className="row align-items-center">
+
+        <div className="user-moves container text-center mt-3">
+          <div className="row align-items-center mx-2">
             <ControlButton text="L'" move={"y01"} />
-            <ControlButton text="U " move={`x${shape - 1}1`} />
-            <ControlButton text="U'" move={`x${shape - 1}3`} />
-            <ControlButton text="R" move={`y${shape - 1}1`} />
+            <ControlButton text="U " move={`x${shape.current - 1}1`} />
+            <ControlButton text="U'" move={`x${shape.current - 1}3`} />
+            <ControlButton text="R" move={`y${shape.current - 1}1`} />
           </div>
-          <div className="row align-items-center">
-            <ControlButton text="B " move={`z${shape - 1}3`} />
-            <ControlButton text="F " move={"z01"} />
+          <div className="row align-items-center mx-2">
+            <ControlButton text="B " move={`z${shape.current - 1}3`} />
             <ControlButton text="F'" move={"z03"} />
-            <ControlButton text="B'" move={`z${shape - 1}1`} />
+            <ControlButton text="F " move={"z01"} />
+            <ControlButton text="B'" move={`z${shape.current - 1}1`} />
           </div>
-          <div className="row align-items-center">
+          <div className="row align-items-center mx-2">
             <ControlButton text="L " move={"y03"} />
             <ControlButton text="D'" move={"x01"} />
             <ControlButton text="D " move={"x03"} />
-            <ControlButton text="R'" move={`y${shape - 1}3`} />
+            <ControlButton text="R'" move={`y${shape.current - 1}3`} />
           </div>
-          <div className="row align-items-center">
-            <ControlButton text="X " move={getViewRotation("x1", shape)} />
-            <ControlButton text="Y " move={getViewRotation("y1", shape)} />
-            <ControlButton text="X'" move={getViewRotation("x3", shape)} />
+          <div className="row align-items-center mx-2">
+            <ControlButton
+              text="X "
+              move={getViewRotation("x1", shape.current)}
+            />
+            <ControlButton
+              text="Y "
+              move={getViewRotation("y1", shape.current)}
+            />
+            <ControlButton
+              text="X'"
+              move={getViewRotation("x3", shape.current)}
+            />
           </div>
-          <div className="row align-items-center">
-            <ControlButton text="Z'" move={getViewRotation("z3", shape)} />
-            <ControlButton text="Y'" move={getViewRotation("y3", shape)} />
-            <ControlButton text="Z " move={getViewRotation("z1", shape)} />
+          <div className="row align-items-center mx-2">
+            <ControlButton
+              text="Z'"
+              move={getViewRotation("z3", shape.current)}
+            />
+            <ControlButton
+              text="Y'"
+              move={getViewRotation("y3", shape.current)}
+            />
+            <ControlButton
+              text="Z "
+              move={getViewRotation("z1", shape.current)}
+            />
           </div>
         </div>
       </div>

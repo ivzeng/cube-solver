@@ -2,22 +2,14 @@
   position: relative;
   height: 35vh;
   width: 100vw;
-  background-color: rgb(52, 44, 58);
-  overflow: hidden;
-}
-
-.rubik-canvas {
-  position: absolute;
-  top: 0%;
-  height: 100%;
-  width: 100%;
+  background-color: rgb(63, 58, 66);
   overflow: hidden;
 }
 
 .user-control {
-  padding-top: 10px;
-  height: 55vh;
+  padding-top: 15px;
+  height: 65vh;
   width: 100vw;
-  background-color: rgb(199, 193, 252);
+  background-color: rgb(252, 246, 255);
   overflow: hidden;
 }

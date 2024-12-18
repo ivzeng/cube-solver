@@ -8,7 +8,19 @@ export function appliedMoves(cubeInfo: number[][][], moves: string) {
   return res;
 }
 
-export function applyMove(cubeInfo: number[][][], moves: string) {
+export function getViewRotation(rotation: string, shape: number) {
+  let moves = "";
+  for (let i = 0; i < shape; i++) {
+    moves += rotation[0] + i + rotation[1];
+  }
+  return moves;
+}
+
+const deepCopy = (arr: any[]): any[] => {
+  return arr.map((item) => (Array.isArray(item) ? deepCopy(item) : item));
+};
+
+function applyMove(cubeInfo: number[][][], moves: string) {
   let axis = moves.charAt(0);
   let layer = +moves.charAt(1);
   let angle = +moves.charAt(2);
@@ -16,10 +28,6 @@ export function applyMove(cubeInfo: number[][][], moves: string) {
   rotateFace(cubeInfo, axis, layer, angle, shape);
   rotateSide(cubeInfo, axis, layer, angle, shape);
 }
-
-const deepCopy = (arr: any[]): any[] => {
-  return arr.map((item) => (Array.isArray(item) ? deepCopy(item) : item));
-};
 
 function rotateFace(
   cubeInfo: number[][][],
@@ -50,9 +58,6 @@ function rotateFace(
       default:
     }
 
-    console.log(layer);
-    console.log(faceRotationAngle);
-
     cubeInfo[faceIndex] = rotatedFace(
       cubeInfo[faceIndex],
       faceRotationAngle,
@@ -62,7 +67,6 @@ function rotateFace(
 }
 
 function rotatedFace(face: number[][], rotationAngle: number, shape: number) {
-  console.log(rotationAngle);
   return face.map((row, y) =>
     row.map((_, x) => {
       let pos = [x, y, shape - x - 1, shape - y - 1];
@@ -124,4 +128,23 @@ function ringShift(
     let [faceIndex, y, x] = ringPos[(i + distance) % ringLength];
     cubeInfo[faceIndex][y][x] = temp[i];
   }
+}
+
+export function reversedMoves(moves: string) {
+  let rMoves = "";
+  let prevReversed = "";
+  for (let i = moves.length - 3; i >= 0; i -= 3) {
+    let curMove = moves.substring(i, i + 3);
+    if (curMove == prevReversed) {
+      prevReversed = "";
+    } else {
+      rMoves += prevReversed;
+      prevReversed = reversedMove(curMove);
+    }
+  }
+  return rMoves + prevReversed;
+}
+
+export function reversedMove(move: string) {
+  return move.length == 0 ? "" : move.substring(0, 2) + (4 - +move[2]);
 }
