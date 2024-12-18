@@ -16,9 +16,9 @@ function Collapse({
   return (
     <div
       className="collapse-container align-items-center mt-2"
-      style={{ display: "flex", width: "100%" }}
+      style={{ display: "flex" }}
     >
-      <p style={{ width: "30%" }}>
+      <p>
         <button
           className={`btn ${btnClassName} btn-block`}
           type="button"
@@ -26,12 +26,12 @@ function Collapse({
           data-bs-target={`#${id}`}
           aria-expanded="false"
           aria-controls={id}
-          style={{ width: "80%" }}
+          style={{ width: "100%" }}
         >
           {textMain}
         </button>
       </p>
-      <div style={{ height: "50px", width: "90%" }}>
+      <div style={{ height: "50px", width: "80%" }}>
         <div className={`collapse ${collapseClassName}`} id={id}>
           <div
             className="card card-body overflow-y-scroll"
