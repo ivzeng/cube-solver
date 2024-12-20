@@ -4,6 +4,7 @@ interface Props {
   btnClassName: string;
   collapseClassName: string;
   id: string;
+  onClick: () => void;
 }
 
 function Collapse({
@@ -12,12 +13,10 @@ function Collapse({
   btnClassName,
   collapseClassName,
   id,
+  onClick,
 }: Props) {
   return (
-    <div
-      className="collapse-container align-items-center mt-2"
-      style={{ display: "flex" }}
-    >
+    <>
       <p>
         <button
           className={`btn ${btnClassName} btn-block`}
@@ -27,11 +26,12 @@ function Collapse({
           aria-expanded="false"
           aria-controls={id}
           style={{ width: "100%" }}
+          onClick={onClick}
         >
           {textMain}
         </button>
       </p>
-      <div style={{ height: "50px", width: "80%" }}>
+      <div style={{ height: "50px", width: "75%" }}>
         <div className={`collapse ${collapseClassName}`} id={id}>
           <div
             className="card card-body overflow-y-scroll"
@@ -41,7 +41,7 @@ function Collapse({
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

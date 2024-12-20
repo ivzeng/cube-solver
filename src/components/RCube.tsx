@@ -2,36 +2,45 @@ import React, { useRef, useState } from "react";
 import "../scss/RCube.css";
 import RCubeDisplay from "./RCubeDisplay";
 import { Canvas } from "@react-three/fiber";
-import { appliedMoves, reversedMove, reverseSolve } from "../utils/RCubeUtils";
+import { RCubeInfo, appliedMoves, initRCubeInfo } from "../utils/rCubeInfo";
+import { getShuffle, reversedMove } from "../utils/rCubeMove";
 import BtnDropdown from "./BtnDropdown";
 import Collapse from "./Collapse";
+import { RCubeCombinations } from "../utils/RCubeCombinations";
+
+const combinationsSearchDepth = 3;
 
 const RCube: React.FC = () => {
-  const initRCubeInfo = (shape: number): number[][][] => {
-    return Array(6)
-      .fill(null)
-      .map((_, index) =>
-        Array(shape)
-          .fill(null)
-          .map(() => Array(shape).fill(index))
-      );
-  };
-
   const ControlButton: React.FC<{ text: string; move: string }> = ({
     text,
     move,
-  }) => (
-    <button
-      type="button"
-      className="btn btn-outline-primary col m-1"
-      onClick={() => {
-        updateHist(move);
-        setRCubeInfo(appliedMoves(rCubeInfo, move));
-      }}
-    >
-      {`${text}| ${move}`}
-    </button>
-  );
+  }) => {
+    let btnType = "btn-outline-primary";
+    const nextStep = frontQuickSolution();
+    if (
+      showHint &&
+      (nextStep == move ||
+        (nextStep.substring(0, 2) == move.substring(0, 2) &&
+          move[2] == "1" &&
+          nextStep[2] == "2"))
+    ) {
+      btnType = "btn-info";
+    }
+    return (
+      <button
+        type="button"
+        className={`btn ${btnType} col m-1`}
+        onClick={() => {
+          updateHist(move);
+          const newRCubeInfo = appliedMoves(rCubeInfo, [move]);
+          setRCubeInfo(newRCubeInfo);
+          updateQuickSolution(newRCubeInfo);
+        }}
+      >
+        {`${text}| ${move}`}
+      </button>
+    );
+  };
 
   const handleShapeChange = (newShape: number) => {
     clearHist();
@@ -44,32 +53,58 @@ const RCube: React.FC = () => {
   };
 
   const clearHist = () => {
-    hist.current = "";
+    hist.current = [];
   };
 
   const updateHist = (move: string) => {
-    hist.current += move;
+    hist.current.push(move);
   };
 
   const peekHist = () => {
     let hl = hist.current.length;
-    return hl == 0 ? "" : hist.current.substring(hl - 3, hl);
+    return hl == 0 ? "" : hist.current[hl - 1];
   };
 
   const popHist = () => {
-    let histTop = peekHist();
-    if (histTop.length > 0) {
-      hist.current = hist.current.substring(0, hist.current.length - 3);
-    }
-    return histTop;
+    let back = hist.current.pop();
+    return back ? back : "";
   };
 
-  let shape = useRef(3);
-  let hist = useRef("");
-  const [rCubeInfo, setRCubeInfo] = useState<number[][][]>(
+  const updateQuickSolution = (
+    rCubeInfo: RCubeInfo,
+    showing: boolean = showHint
+  ) => {
+    if (!showing) {
+      return;
+    }
+    quickSolution.current = combinations.current.updateFindPath(
+      initRCubeInfo(shape.current),
+      rCubeInfo,
+      hist.current
+    );
+  };
+
+  const frontQuickSolution = () => {
+    return quickSolution.current.length > 0 ? quickSolution.current[0] : "none";
+  };
+
+  const shape = useRef(3);
+
+  const [rCubeInfo, setRCubeInfo] = useState<RCubeInfo>(
     initRCubeInfo(shape.current)
   );
+
   const [is3d, setIs3d] = useState<boolean>(false);
+
+  const hist: React.MutableRefObject<string[]> = useRef([]);
+
+  const combinations: React.MutableRefObject<RCubeCombinations> = useRef(
+    new RCubeCombinations(rCubeInfo, combinationsSearchDepth)
+  );
+
+  const quickSolution: React.MutableRefObject<string[]> = useRef([]);
+
+  const [showHint, setShowHint] = useState(false);
 
   return (
     <>
@@ -106,25 +141,50 @@ const RCube: React.FC = () => {
               btnClassName="btn btn-danger"
               id="shapeDropdown"
             />
+          </div>
+          <div className="row text-center mt-2 ">
             <button
               type="button"
-              className="btn btn-success col"
+              className="btn btn-success col-3 mx-3"
               onClick={() => {
                 const prevMove = popHist();
-                setRCubeInfo(appliedMoves(rCubeInfo, reversedMove(prevMove)));
+                const nextRCI = appliedMoves(rCubeInfo, [
+                  reversedMove(prevMove),
+                ]);
+                setRCubeInfo(nextRCI);
+                updateQuickSolution(nextRCI);
               }}
               disabled={peekHist().length == 0}
             >
               {`Undo ${peekHist()}`}
             </button>
+            <button
+              type="button"
+              className="btn btn-warning col-2 me-5"
+              onClick={() => {
+                const moves = getShuffle(shape.current, 20);
+                hist.current = hist.current.concat(moves);
+                const nextRCI = appliedMoves(rCubeInfo, moves);
+                setRCubeInfo(nextRCI);
+                updateQuickSolution(nextRCI);
+              }}
+            >
+              {"Shuffle"}
+            </button>
           </div>
-          <Collapse
-            textMain="Solution:"
-            textContent={reverseSolve(hist.current)}
-            btnClassName="btn-info"
-            collapseClassName=""
-            id="solution"
-          />
+          <div className="align-items-center mt-2" style={{ display: "flex" }}>
+            <Collapse
+              textMain="Solution:"
+              textContent={quickSolution.current.join(" ")}
+              btnClassName="btn-info"
+              collapseClassName=""
+              id="solution"
+              onClick={() => {
+                setShowHint(!showHint);
+                updateQuickSolution(rCubeInfo, !showHint);
+              }}
+            />
+          </div>
         </div>
 
         <div className="user-moves container text-center mt-2">

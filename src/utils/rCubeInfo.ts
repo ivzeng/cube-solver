@@ -1,9 +1,23 @@
-export function appliedMoves(cubeInfo: number[][][], moves: string) {
-  let i = 0;
-  let res = deepCopy(cubeInfo);
-  let shape = cubeInfo[0].length;
-  while (i < moves.length) {
-    const curMove = moves.substring(i, i + 3);
+export type RCubeInfo = number[][][];
+
+export function initRCubeInfo(shape: number): RCubeInfo {
+  return Array(6)
+    .fill(null)
+    .map((_, index) =>
+      Array(shape)
+        .fill(null)
+        .map(() => Array(shape).fill(index))
+    );
+}
+
+export function rCubeInfo2String(rCubeInfo: RCubeInfo): string {
+  return rCubeInfo.flat(Infinity).join("");
+}
+
+export function appliedMoves(rCubeInfo: RCubeInfo, moves: string[]) {
+  let res = deepCopy(rCubeInfo);
+  let shape = rCubeInfo[0].length;
+  for (const curMove of moves) {
     if (curMove[0] == "r") {
       for (let i = 0; i < shape; i++) {
         applyMove(res, curMove[1] + i + curMove[2], shape);
@@ -11,25 +25,69 @@ export function appliedMoves(cubeInfo: number[][][], moves: string) {
     } else {
       applyMove(res, curMove, shape);
     }
-    i += 3;
   }
   return res;
+}
+
+export function orbitFree(rCubeInfo: RCubeInfo) {
+  return appliedMoves(rCubeInfo, orbitFreeMoves(rCubeInfo));
 }
 
 const deepCopy = (arr: any[]): any[] => {
   return arr.map((item) => (Array.isArray(item) ? deepCopy(item) : item));
 };
 
-function applyMove(cubeInfo: number[][][], moves: string, shape: number) {
-  let axis = moves.charAt(0);
-  let layer = +moves.charAt(1);
-  let angle = +moves.charAt(2);
-  rotateFace(cubeInfo, axis, layer, angle, shape);
-  rotateSide(cubeInfo, axis, layer, angle, shape);
+export function orbitFreeMoves(rCubeInfo: RCubeInfo): string[] {
+  const shape = rCubeInfo[0].length;
+  let res: string[] = [];
+  if (shape % 2 == 0) {
+    return res;
+  }
+  const idPos = (shape / 2) >> 0;
+  let tPos = 0;
+  let fPos = 0;
+  for (let i = 0; i < 6; i++) {
+    const colId = rCubeInfo[i][idPos][idPos];
+    if (colId == 0) {
+      tPos = i;
+    } else if (colId == 1) {
+      fPos = i;
+    }
+  }
+  if (fPos >= 1 && fPos <= 4) {
+    if (fPos != 1) {
+      res.push("rx" + (fPos - 1));
+    }
+    if (tPos >= 1 && tPos <= 4) {
+      res.push("rz" + ((fPos - tPos + 4) % 4));
+    } else if (tPos == 5) {
+      res.push("rz2");
+    }
+  } else if (fPos == 0) {
+    if (tPos != 3) {
+      res.push("rx" + ((tPos + 1) % 4));
+    }
+    res.push("ry3");
+  } else if (fPos == 5) {
+    if (tPos != 1) {
+      res.push("rx" + (tPos - 1));
+    }
+    res.push("ry1");
+  }
+
+  return res;
+}
+
+function applyMove(rCubeInfo: RCubeInfo, moves: string, shape: number) {
+  const axis = moves.charAt(0);
+  const layer = +moves.charAt(1);
+  const angle = +moves.charAt(2);
+  rotateFace(rCubeInfo, axis, layer, angle, shape);
+  rotateSide(rCubeInfo, axis, layer, angle, shape);
 }
 
 function rotateFace(
-  cubeInfo: number[][][],
+  rCubeInfo: RCubeInfo,
   axis: string,
   layer: number,
   angle: number,
@@ -57,8 +115,8 @@ function rotateFace(
       default:
     }
 
-    cubeInfo[faceIndex] = rotatedFace(
-      cubeInfo[faceIndex],
+    rCubeInfo[faceIndex] = rotatedFace(
+      rCubeInfo[faceIndex],
       faceRotationAngle,
       shape
     );
@@ -75,7 +133,7 @@ function rotatedFace(face: number[][], rotationAngle: number, shape: number) {
 }
 
 function rotateSide(
-  cubeInfo: number[][][],
+  rCubeInfo: RCubeInfo,
   axis: string,
   layer: number,
   angle: number,
@@ -111,42 +169,20 @@ function rotateSide(
     default:
       break;
   }
-  ringShift(cubeInfo, ringPos, angle * shape);
+  ringShift(rCubeInfo, ringPos, angle * shape);
 }
 
 function ringShift(
-  cubeInfo: number[][][],
+  rCubeInfo: RCubeInfo,
   ringPos: [number, number, number][],
   distance: number
 ) {
   let temp = ringPos.map(([faceIndex, y, x]) => {
-    return cubeInfo[faceIndex][y][x];
+    return rCubeInfo[faceIndex][y][x];
   });
   let ringLength = temp.length;
   for (let i = 0; i < ringLength; i++) {
     let [faceIndex, y, x] = ringPos[(i + distance) % ringLength];
-    cubeInfo[faceIndex][y][x] = temp[i];
+    rCubeInfo[faceIndex][y][x] = temp[i];
   }
-}
-
-export function reverseSolve(moves: string) {
-  let rMoveStack: string[] = [];
-  for (let i = 0; i < moves.length; i += 3) {
-    const curMove = moves.substring(i, i + 3);
-    let rl = rMoveStack.length;
-    if (rl > 0 && rMoveStack[rl - 1] == curMove) {
-      rMoveStack.pop();
-    } else {
-      rMoveStack.push(reversedMove(curMove));
-    }
-  }
-  let res = "";
-  for (let i = rMoveStack.length - 1; i >= 0; i--) {
-    res += rMoveStack[i];
-  }
-  return res;
-}
-
-export function reversedMove(move: string) {
-  return move.length == 0 ? "" : move.substring(0, 2) + (4 - +move[2]);
 }
