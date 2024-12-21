@@ -160,7 +160,7 @@ const RCube: React.FC = () => {
             </button>
             <button
               type="button"
-              className="btn btn-warning col-2 me-5"
+              className="btn btn-warning col-3 me-5"
               onClick={() => {
                 const moves = getShuffle(shape.current, 20);
                 hist.current = hist.current.concat(moves);

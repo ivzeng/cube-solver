@@ -35,6 +35,7 @@ export class RCubeCombinations {
     const faceMoves = this.findPath(startKey, endKey)
       .split(" ")
       .filter((move) => move.length > 0);
+    this.updateMoves(resultRCubeInfo, faceMoves);
     return orbitMoves.concat(faceMoves);
   }
 

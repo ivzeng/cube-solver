@@ -17,7 +17,7 @@ function Collapse({
 }: Props) {
   return (
     <>
-      <p>
+      <p className="mx-2" style={{ width: "20%" }}>
         <button
           className={`btn ${btnClassName} btn-block`}
           type="button"
@@ -31,7 +31,7 @@ function Collapse({
           {textMain}
         </button>
       </p>
-      <div style={{ height: "50px", width: "75%" }}>
+      <div style={{ height: "50px", width: "75%" }} className="mx-2">
         <div className={`collapse ${collapseClassName}`} id={id}>
           <div
             className="card card-body overflow-y-scroll"
