@@ -16,10 +16,6 @@ Visit the website here: [Rubik's Cube](https://ivzeng.github.io/rubiks-cube/)
 
 To use this website, simply visit the link and start following the guide. No additional downloads or software are required.
 
-## Contributing
-
-If you have any suggestions, corrections, or improvements, feel free to contribute! You can fork this project, make your changes, and submit a pull request. Contributions are always welcome.
-
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
@@ -28,11 +24,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 For any questions or feedback, please reach out to the project maintainer:
 
-- Email: ivzeng@example.com
+- Email: ivzeng@uwaterloo.ca
 - GitHub: [ivzeng](https://github.com/ivzeng)
 
 Happy cubing!
-
----
-
-_Figuring out the puzzles of life, one twist at a time._
